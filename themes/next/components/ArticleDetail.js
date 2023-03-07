@@ -28,14 +28,14 @@ export default function ArticleDetail(props) {
   return (
       <div id="container"
             data-aos="fade-down"
-            data-aos-duration="600"
+            data-aos-duration="300"
             data-aos-easing="ease-in-out"
-            data-aos-once="false"
+            data-aos-once="true"
             data-aos-anchor-placement="top-bottom"
 
             className="shadow md:hover:shadow-2xl overflow-x-auto flex-grow mx-auto w-screen md:w-full ">
             <div itemScope itemType="https://schema.org/Movie"
-                className="subpixel-antialiased py-10 px-5 lg:pt-24 md:px-24  dark:border-gray-700 bg-white dark:bg-hexo-black-gray"
+                className="subpixel-antialiased overflow-y-hidden py-10 px-5 lg:pt-24 md:px-24  dark:border-gray-700 bg-white dark:bg-hexo-black-gray"
             >
 
                 {showArticleInfo && <header className='animate__slideInDown animate__animated'>
@@ -140,5 +140,5 @@ export default function ArticleDetail(props) {
             </div>
 
         </div>
-  );
+  )
 }
