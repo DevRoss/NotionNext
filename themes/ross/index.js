@@ -1,3 +1,4 @@
+/* eslint react/no-unknown-property: ["error", { "ignore": ["jsx", "global"] }] */
 import { useState } from 'react'
 import { useGlobal } from '@/lib/global'
 import { saveDarkModeToCookies } from '@/lib/theme'
@@ -24,7 +25,7 @@ function Base ({ children, meta }) {
     document.documentElement.classList.toggle('dark', next)
     document.documentElement.classList.toggle('light', !next)
   }
-  return <div className='ross-journal' data-mode={isDarkMode ? 'dark' : 'light'}>
+  return <div className={`ross-journal${isDarkMode ? ' dark-mode' : ''}`} data-mode={isDarkMode ? 'dark' : 'light'}>
     <CommonHead meta={meta} /><style jsx global>{styles}</style>
     <div className='shell'><header><Link className='brand' href={path('')} aria-label='Ross 首页'><i className='mark' aria-hidden='true' />ross<span className='brand-caption'> / trading journal</span></Link>
       <nav><Link href={path('')}>文章</Link><Link href={path('#about')}>关于</Link><Link href={path('search')} aria-label='搜索文章' className='iconbtn'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5'><circle cx='10.5' cy='10.5' r='6.5' /><path d='m16 16 5 5' /></svg></Link><button className='iconbtn mode-toggle' type='button' onClick={toggleMode} aria-label={isDarkMode ? '切换到白天主题' : '切换到黑夜主题'} title={isDarkMode ? '切换到白天主题' : '切换到黑夜主题'}>{isDarkMode ? <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' aria-hidden='true'><circle cx='12' cy='12' r='4' /><path d='M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5' /></svg> : <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' aria-hidden='true'><path d='M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z' /></svg>}</button></nav>
@@ -34,12 +35,12 @@ function Base ({ children, meta }) {
   </div>
 }
 function MarketChart ({ compact = false }) {
-  const values = [154,145,151,130,138,121,125,106,119,98,108,87,94,73,89,67,78,58,65,43,52,36]
+  const values = [154, 145, 151, 130, 138, 121, 125, 106, 119, 98, 108, 87, 94, 73, 89, 67, 78, 58, 65, 43, 52, 36]
   return <div className={compact ? 'market-chart compact' : 'market-chart'}>
     <div className='chart-heading'><span>MARKET STRUCTURE</span><span>01 / STUDY</span></div>
     <svg viewBox='0 0 440 230' role='img' aria-label='价格与成交量示意图，非实时行情'>
-      {[45,90,135,180].map(y => <path key={y} className='chart-grid' d={`M12 ${y}H428`} />)}
-      {values.map((y,i) => <g key={i} className={i % 4 === 2 ? 'candle down' : 'candle'}><path d={`M${22+i*18} ${y-13}v33`} /><rect x={18+i*18} y={y} width='8' height={i % 3 === 0 ? 13 : 8} /><rect className='volume' x={18+i*18} y={219-(i*7%25+8)} width='8' height={i*7%25+8} /></g>)}
+      {[45, 90, 135, 180].map(y => <path key={y} className='chart-grid' d={`M12 ${y}H428`} />)}
+      {values.map((y, i) => <g key={i} className={i % 4 === 2 ? 'candle down' : 'candle'}><path d={`M${22 + i * 18} ${y - 13}v33`} /><rect x={18 + i * 18} y={y} width='8' height={i % 3 === 0 ? 13 : 8} /><rect className='volume' x={18 + i * 18} y={219 - (i * 7 % 25 + 8)} width='8' height={i * 7 % 25 + 8} /></g>)}
       <path className='average' d='M18 168C88 157 94 140 155 130S250 107 300 89 360 78 419 61' />
       <path className='chart-guide' d='M12 36H428' />
     </svg><div className='chart-foot'><span>PRICE / VOLUME</span><span>ILLUSTRATIVE · 非实时行情</span></div>
