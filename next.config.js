@@ -3,6 +3,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 module.exports = withBundleAnalyzer({
+  // Keep static generation within the upstream Notion request budget.
+  experimental: { cpus: 1 },
   images: {
     // 图片压缩
     formats: ['image/avif', 'image/webp'],
