@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useGlobal } from '@/lib/global'
+import { saveDarkModeToCookies } from '@/lib/theme'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import BLOG from '@/blog.config'
@@ -14,22 +16,42 @@ const date = post => String(post.date?.start_date || post.createdTime || '').sli
 const label = post => [post.category].flat().filter(Boolean).join(' · ')
 
 function Base ({ children, meta }) {
-  return <div className='ross-journal'>
+  const { isDarkMode, updateDarkMode } = useGlobal()
+  const toggleMode = () => {
+    const next = !isDarkMode
+    updateDarkMode(next)
+    saveDarkModeToCookies(next)
+    document.documentElement.classList.toggle('dark', next)
+    document.documentElement.classList.toggle('light', !next)
+  }
+  return <div className='ross-journal' data-mode={isDarkMode ? 'dark' : 'light'}>
     <CommonHead meta={meta} /><style jsx global>{styles}</style>
-    <div className='shell'><header><Link className='brand' href={path('')} aria-label='Ross 首页'><i className='mark' />ross<span style={{ color: 'var(--accent)' }}>.</span></Link>
-      <nav><Link href={path('')}>文章</Link><Link href={path('#about')}>关于</Link><Link href={path('search')} aria-label='搜索文章' className='iconbtn'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5'><circle cx='10.5' cy='10.5' r='6.5' /><path d='m16 16 5 5' /></svg></Link></nav>
-    </header><main>{children}<section className='about' id='about'><h2>A little about me.</h2><div><p>写代码，也试着理解代码之外的世界。<br />这里是我的长期笔记：从机器学习到市场微观结构，从一个问题到一次实践。保留好奇，慢慢构建。</p><div className='about-links'>
+    <div className='shell'><header><Link className='brand' href={path('')} aria-label='Ross 首页'><i className='mark' aria-hidden='true' />ross<span className='brand-caption'> / trading journal</span></Link>
+      <nav><Link href={path('')}>文章</Link><Link href={path('#about')}>关于</Link><Link href={path('search')} aria-label='搜索文章' className='iconbtn'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5'><circle cx='10.5' cy='10.5' r='6.5' /><path d='m16 16 5 5' /></svg></Link><button className='iconbtn mode-toggle' type='button' onClick={toggleMode} aria-label={isDarkMode ? '切换到白天主题' : '切换到黑夜主题'} title={isDarkMode ? '切换到白天主题' : '切换到黑夜主题'}>{isDarkMode ? <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' aria-hidden='true'><circle cx='12' cy='12' r='4' /><path d='M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5' /></svg> : <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' aria-hidden='true'><path d='M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z' /></svg>}</button></nav>
+    </header><main>{children}<section className='about' id='about'><h2>Behind the trades.</h2><div><p>我是 Ross，交易员，也是开发者。<br />研究市场微观结构、量化策略与 AI。记录假设、执行与复盘，让每一次决策都有迹可循。</p><div className='about-links'>
       {BLOG.CONTACT_GITHUB && <a href={BLOG.CONTACT_GITHUB} target='_blank' rel='noreferrer'>GitHub ↗</a>}{BLOG.CONTACT_TWITTER && <a href={BLOG.CONTACT_TWITTER} target='_blank' rel='noreferrer'>X / Twitter ↗</a>}{BLOG.CONTACT_EMAIL && <a href={`mailto:${BLOG.CONTACT_EMAIL}`}>Email ↗</a>}
-    </div></div></section></main><footer><span>© {new Date().getFullYear()} {BLOG.AUTHOR}</span><span>THINK CLEARLY. BUILD QUIETLY.</span></footer></div>
+    </div></div></section></main><footer><span>© {new Date().getFullYear()} {BLOG.AUTHOR}</span><span>OBSERVE. TEST. EXECUTE.</span></footer></div>
+  </div>
+}
+function MarketChart ({ compact = false }) {
+  const values = [154,145,151,130,138,121,125,106,119,98,108,87,94,73,89,67,78,58,65,43,52,36]
+  return <div className={compact ? 'market-chart compact' : 'market-chart'}>
+    <div className='chart-heading'><span>MARKET STRUCTURE</span><span>01 / STUDY</span></div>
+    <svg viewBox='0 0 440 230' role='img' aria-label='价格与成交量示意图，非实时行情'>
+      {[45,90,135,180].map(y => <path key={y} className='chart-grid' d={`M12 ${y}H428`} />)}
+      {values.map((y,i) => <g key={i} className={i % 4 === 2 ? 'candle down' : 'candle'}><path d={`M${22+i*18} ${y-13}v33`} /><rect x={18+i*18} y={y} width='8' height={i % 3 === 0 ? 13 : 8} /><rect className='volume' x={18+i*18} y={219-(i*7%25+8)} width='8' height={i*7%25+8} /></g>)}
+      <path className='average' d='M18 168C88 157 94 140 155 130S250 107 300 89 360 78 419 61' />
+      <path className='chart-guide' d='M12 36H428' />
+    </svg><div className='chart-foot'><span>PRICE / VOLUME</span><span>ILLUSTRATIVE · 非实时行情</span></div>
   </div>
 }
 function Hero () {
-  return <section className='hero'><div><div className='eyebrow'><span className='dot' />A PERSONAL SPACE FOR IDEAS</div><h1>在变化中思考，<br />在<span>构建中理解。</span></h1><p className='intro'>我是 Ross，一名开发者。<br />记录算法、AI 与交易，也记录技术之外的生活。</p><span className='signature'>Ross</span></div><img className='orbit' src={path('ross/orbit.svg')} width='360' height='320' alt='' /></section>
+  return <><section className='hero'><div><div className='eyebrow'><span className='dot' />INDEPENDENT TRADER & DEVELOPER</div><h1>在噪声中，<br />寻找<span>微小的优势。</span></h1><p className='intro'>我是 Ross，交易员与开发者。<br />关于市场、算法与 AI 的研究，以及交易之外的思考。</p><a className='hero-link' href='#writing'>阅读研究日志 <span>↓</span></a></div><MarketChart /></section><div className='principles'><span><b>01</b> 概率思维</span><span><b>02</b> 风险先行</span><span><b>03</b> 长期复利</span><span className='principles-note'>A PROCESS, NOT A PREDICTION.</span></div></>
 }
 function Rows ({ posts = [], featured = false }) {
   if (!posts.length) return <p className='empty'>暂时没有相关文章。</p>
   return <div id='container'>{posts.map((post, i) => featured && i === 0
-    ? <Link className='featured' key={post.id} href={path(post.slug)}><div className='cover'><img src={path('ross/market.svg')} alt='' width='500' height='250' /><span className='cover-label'>FIELD NOTES / IDEAS & PRACTICE</span></div><div className='featurecopy'><div className='meta'><span className='topic'>{label(post)}</span><time>{date(post)}</time></div><h3>{post.title}</h3><p>{post.summary}</p><div className='read'>阅读笔记 <span>↗</span></div></div></Link>
+    ? <Link className='featured' key={post.id} href={path(post.slug)}><div className='cover'><MarketChart compact /></div><div className='featurecopy'><div className='meta'><span className='topic'>{label(post)}</span><time>{date(post)}</time></div><h3>{post.title}</h3><p>{post.summary}</p><div className='read'>阅读笔记 <span>↗</span></div></div></Link>
     : <Link className='row' key={post.id} href={path(post.slug)}><time>{date(post)}</time><div><h3>{post.title}</h3><p>{post.summary}</p></div><span className='tag'>{label(post)}</span><span className='arrow'>↗</span></Link>)}</div>
 }
 function Pagination ({ page = 1, postCount = 0 }) {
@@ -46,7 +68,7 @@ function List ({ posts = [], ...props }) {
   return <><Rows posts={scroll && !expanded ? posts.slice(0, 5) : posts} featured={props.featured} />{scroll ? posts.length > 5 && <button className='more' onClick={() => setExpanded(!expanded)}>{expanded ? '收起文章 ↑' : '展开更多文章 ↓'}</button> : <Pagination {...props} />}</>
 }
 export function LayoutIndex (props) {
-  return <Base {...props}><Hero /><section id='writing'><div className='sectiontop'><h2>文字与思考 <span className='count'>SELECTED WRITING</span></h2><div className='filters'><span className='filter active'>全部</span><Link className='filter' href={path('tag/NLP')}>AI</Link><Link className='filter' href={path('tag/算法')}>算法</Link><Link className='filter' href={path('tag/金融')}>交易</Link></div></div><List {...props} featured /></section></Base>
+  return <Base {...props}><Hero /><section id='writing'><div className='sectiontop'><h2>研究与复盘 <span className='count'>RESEARCH NOTES</span></h2><div className='filters'><span className='filter active'>全部</span><Link className='filter' href={path('tag/NLP')}>AI</Link><Link className='filter' href={path('tag/算法')}>算法</Link><Link className='filter' href={path('tag/金融')}>交易</Link></div></div><List {...props} featured /></section></Base>
 }
 export function LayoutSearch (props) {
   const router = useRouter()
@@ -57,7 +79,7 @@ export function LayoutSlug (props) {
   const { post, lock, validPassword } = props
   return <Base {...props}><article className='reading'>{!post ? <p>正在加载文章…</p> : <><Link className='meta' href={path('')}>← 全部文章</Link><h1>{post.title}</h1><div className='meta'><time>{date(post)}</time><span>{label(post)}</span></div>{lock ? <ArticleLock validPassword={validPassword} /> : <><section id='notion-article'><NotionPage post={post} /></section><Comment frontMatter={post} /></>}</>}</article></Base>
 }
-export function LayoutPage (props) { return <Base {...props}><h1 className='route-title'>文字与思考</h1><List {...props} /></Base> }
+export function LayoutPage (props) { return <Base {...props}><h1 className='route-title'>研究与复盘</h1><List {...props} /></Base> }
 export function LayoutTag (props) { return <Base {...props}><h1 className='route-title'>{props.tag}</h1><List {...props} /></Base> }
 export function LayoutCategory (props) { return <Base {...props}><h1 className='route-title'>{props.category}</h1><List {...props} /></Base> }
 export function LayoutArchive (props) { return <Base {...props}>{Object.entries(props.archivePosts || {}).map(([month, posts]) => <section key={month} id={month}><h2 className='route-title'>{month}</h2><Rows posts={posts} /></section>)}</Base> }

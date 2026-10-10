@@ -1,11 +1,15 @@
-# Ross theme
+# Ross trading journal theme
 
-The `ross` theme implements the approved minimal blog design with real Notion data. It keeps the existing article URLs, Notion renderer, password gate, comments, search, archives, category/tag routes, and pagination. Decorative SVG assets are local and do not use expiring Notion cover URLs.
+A minimal trader/developer journal with graphite and warm-white color schemes, muted green accents, monospaced metadata, and an illustrative price/volume chart. Charts are decorative studies, explicitly labeled as non-live data.
 
-## Deploy
+## Appearance
 
-Merge the theme branch into the branch connected to Vercel. If the deployment sets `NEXT_PUBLIC_THEME`, change it to `ross` (environment values override blog.config.js). Set `NEXT_PUBLIC_THEME_SWITCH=false` if that variable exists. The default config uses light appearance and hides the theme switcher. Old theme cookies are ignored when the switcher is disabled; explicit `?theme=hexo` still allows rollback preview.
+The sun/moon button updates the global appearance and stores the choice for one year. Initial appearance follows the system preference when no saved choice exists; explicit `?mode=light` or `?mode=dark` takes priority. Article, search, category, tag, archive, pagination, comments and locked-page routes use the same palette. Reduced-motion preferences disable transitions.
 
-Keep the existing `NOTION_PAGE_ID` and access configuration. The design does not change the Notion API integration or fix failed ISR regeneration; check deployment logs if content is stale. A production build needs access to the configured Notion data source.
+## Deployment
 
-Home, search, article, page, tag, category, archive, and 404 routes use the new theme. The home shortcuts map to the existing NLP, 算法, and 金融 tags. Change those links in `themes/ross/index.js` if the Notion taxonomy changes.
+Use `NEXT_PUBLIC_THEME=ross` and keep the existing Notion data configuration. This variant is available on the `feat/ross-trader-theme` branch for preview before merging into production. The original design remains in git history.
+
+## Content
+
+All article titles, summaries, dates and links come from the existing Notion database. Existing URLs, search, password checks and comments remain intact. The chart does not use market APIs or imply portfolio performance.
