@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>价格冲击实验室 · RossPedia</title>
+<style>
+:root{color-scheme:light;--bg:#f6f7f4;--panel:#fff;--ink:#192522;--muted:#68756f;--line:#dce3dd;--accent:#16835b;--soft:#eaf5ee;--noise:#ac751e}
+:root[data-theme=dark]{color-scheme:dark;--bg:#111715;--panel:#19211e;--ink:#e5eee8;--muted:#98aba0;--line:#334239;--accent:#73d5a0;--soft:#213a2c;--noise:#e0ae62}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.65 system-ui,-apple-system,"PingFang SC",sans-serif}main{max-width:1000px;margin:auto;padding:28px}header{display:flex;align-items:start;justify-content:space-between;gap:16px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--accent);font-weight:700}h1{font-size:27px;letter-spacing:-1px;margin:6px 0}p{margin:6px 0;color:var(--muted)}button,select{font:inherit;color:var(--ink);border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 11px;cursor:pointer}button:hover{border-color:var(--accent)}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:4px}.toolbar{display:flex;align-items:center;gap:10px;margin:22px 0 18px}.toolbar label{color:var(--muted)}.grid{display:grid;grid-template-columns:280px 1fr;gap:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}.control{margin-bottom:22px}.control:last-child{margin-bottom:0}.label{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.label label{font-weight:600}output,.number{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}output{color:var(--accent)}input[type=range]{width:100%;accent-color:var(--accent);margin:12px 0 0;cursor:pointer}.hint{font-size:12px;color:var(--muted)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}.metric small{color:var(--muted)}.number{font-size:25px;line-height:1.4;display:block}.equation{background:var(--soft);padding:12px;border-radius:8px;font:14px/1.8 ui-monospace,monospace;color:var(--accent);overflow-wrap:anywhere}svg{width:100%;height:auto;display:block;margin-top:16px}svg text{fill:var(--muted);font:11px system-ui,sans-serif}.line{stroke:var(--line)}.accent{stroke:var(--accent)}.dot{fill:var(--accent)}.noise{stroke:var(--noise)}.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted)}.legend span:before{content:"";display:inline-block;width:14px;border-top:2px solid var(--accent);margin-right:6px;vertical-align:middle}.legend span:last-child:before{border-color:var(--noise);border-top-style:dashed}.insight{margin:18px 0;padding:14px 17px;border-left:3px solid var(--accent);background:var(--soft);border-radius:0 8px 8px 0;color:var(--ink)}details{border-top:1px solid var(--line);padding-top:13px;color:var(--muted);font-size:12px}summary{cursor:pointer;color:var(--ink)}details p{margin:9px 0}a{color:var(--accent)}footer{font-size:11px;color:var(--muted);margin-top:16px}
+@media(max-width:650px){main{padding:18px}.grid{grid-template-columns:1fr}.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px}.control{margin:0}.card{padding:16px}h1{font-size:23px}.number{font-size:22px}.toolbar{flex-wrap:wrap}header button{white-space:nowrap}}
+@media(max-width:380px){.controls{grid-template-columns:1fr}.metrics{gap:8px}.number{font-size:20px}}
+</style>
+</head>
+<body><main>
+<header><div><div class="eyebrow">ROSSPEDIA / INTERACTIVE NOTE 01</div><h1>价格冲击实验室</h1><p>同样的成交额，为什么价格反应不同？</p></div><button id="theme" aria-label="切换明暗主题" title="切换明暗主题">明 / 暗</button></header>
+<div class="toolbar"><label for="preset">从一个场景开始</label><select id="preset"><option value="directional">买盘占优</option><option value="balanced">同成交额 · 买卖平衡</option><option value="thin">同订单流 · 深度更浅</option><option value="sell">卖盘占优</option><option value="custom" disabled>自定义参数</option></select><button id="reset">重置</button></div>
+<div class="grid">
+<section class="card controls" aria-label="模型参数">
+<div class="control"><div class="label"><label for="buy">主动买入额 B</label><output id="buyOut" for="buy"></output></div><input id="buy" type="range" min="0" max="100" step="5" value="80"><div class="hint">0—100 万欧元</div></div>
+<div class="control"><div class="label"><label for="sell">主动卖出额 S</label><output id="sellOut" for="sell"></output></div><input id="sell" type="range" min="0" max="100" step="5" value="20"><div class="hint">每笔成交按主动方归类，只计一次</div></div>
+<div class="control"><div class="label"><label for="lambda">冲击系数 λ</label><output id="lambdaOut" for="lambda"></output></div><input id="lambda" type="range" min="0.01" max="0.5" step="0.01" value="0.15"><div class="hint">越大，深度越浅 · 欧元 / 10 万欧元</div></div>
+<div class="control"><div class="label"><label for="epsilon">其他价格扰动 ε</label><output id="epsilonOut" for="epsilon"></output></div><input id="epsilon" type="range" min="-1" max="1" step="0.05" value="0"><div class="hint">−1 至 +1 欧元 · 手动设定的噪声</div></div>
+</section>
+<section class="card" aria-label="实时计算结果">
+<div class="metrics">
+<div class="metric"><small>观察到的价格变化 Δm</small><strong class="number" id="delta"></strong><small id="price"></small></div>
+<div class="metric"><small>有向订单失衡 B − S</small><strong class="number" id="imbalance"></strong><small id="volume"></small></div>
+<div class="metric"><small>订单流项 λq</small><strong class="number" id="impact"></strong><small>在 ε = 0 时等于价格变化</small></div>
+<div class="metric"><small>Amihud 型单期比率</small><strong class="number" id="illiq"></strong><small>bp / 10 万欧元成交额</small></div>
+</div>
+<div class="equation" id="formula"></div>
+<svg viewBox="0 0 480 250" role="img" aria-labelledby="chartTitle chartDescription"><title id="chartTitle">订单失衡与价格变化</title><desc id="chartDescription"></desc>
+<line class="line" x1="45" y1="30" x2="45" y2="210"/><line class="line" x1="45" y1="120" x2="450" y2="120"/><line class="line" x1="247.5" y1="30" x2="247.5" y2="210" stroke-dasharray="3 5"/>
+<text x="45" y="17">Δm（欧元）</text><text x="39" y="35" text-anchor="end">+6</text><text x="39" y="124" text-anchor="end">0</text><text x="39" y="212" text-anchor="end">−6</text>
+<text x="45" y="229">−100</text><text x="247.5" y="229" text-anchor="middle">0</text><text x="450" y="229" text-anchor="end">+100</text><text x="450" y="248" text-anchor="end">订单失衡（万欧元）</text>
+<line id="modelLine" class="accent" stroke-width="2" x1="45" x2="450"/><line id="noiseLine" class="noise" stroke-width="2" stroke-dasharray="4 4"/><circle id="modelDot" class="dot" r="4"/><circle id="observedDot" r="6" fill="var(--panel)" stroke="var(--noise)" stroke-width="2"/>
+</svg><div class="legend"><span>线性模型 λq</span><span>加入扰动后的观察值</span></div>
+</section>
+</div>
+<p class="insight" id="insight" role="status" aria-live="polite"></p>
+<details><summary>计算口径与模型边界</summary>
+<p>初始中间价固定为 100 欧元。B、S 为同一期按主动买卖方向分类的成交额；q = (B − S) / 10 万欧元，V = B + S。λ 的数值依赖计量单位。图表固定坐标范围，便于比较不同场景。</p>
+<p>Δm = λq + ε；r = Δm / 100。这里显示 |r| × 10,000 / (V / 100,000)，即 bp / 10 万欧元（1 bp = 0.01%）。V = 0 时比率无定义。Amihud 原始指标用日绝对收益率除以美元成交额，再对有效交易日取平均；本工具是欧元口径的单期教学类比，不能跨币种直接比较。</p>
+<p>λ 是手动输入，ε 是给定扰动，均非历史数据估计。这里没有盘口、成交路径或价格恢复过程，因此中间价变化不等于整笔订单的实际滑点；单期比率为零也不代表市场有无限深度。</p>
+<p>参考：<a href="https://vlab.stern.nyu.edu/docs/liquidity/ILLIQ-HIST" target="_blank" rel="noopener">NYU V-Lab · Amihud 指标</a></p>
+</details><footer>教学模拟 · 无行情请求 · 本地即时计算</footer>
+<noscript>需要启用 JavaScript 才能调整参数。默认示例：B=80万、S=20万、λ=0.15、ε=0，价格由100变为100.90欧元。</noscript>
+</main>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const ids=['buy','sell','lambda','epsilon'];
+const signed=(n,d=2)=>(n>0?'+':'')+n.toFixed(d);
+const presets={directional:[80,20,.15,0],balanced:[50,50,.15,0],thin:[80,20,.4,0],sell:[20,80,.15,0]};
+function render(){
+ const [b,s,l,e]=ids.map(id=>Number($(id).value));
+ const q=(b-s)/10, v=(b+s)*10000, flow=l*q, delta=flow+e;
+ $('buyOut').textContent=b+' 万';$('sellOut').textContent=s+' 万';
+ $('lambdaOut').textContent=l.toFixed(2);$('epsilonOut').textContent=signed(e);
+ $('delta').textContent=signed(delta)+' €';$('price').textContent='100.00 → '+(100+delta).toFixed(2)+' €';
+ $('imbalance').textContent=signed(b-s,0)+' 万';$('volume').textContent='总成交额 '+(b+s)+' 万欧元';
+ $('impact').textContent=signed(flow)+' €';
+ $('illiq').textContent=v>0?(Math.abs(delta/100)*10000/(v/100000)).toFixed(2):'—';
+ $('formula').textContent='Δm = '+l.toFixed(2)+' × ('+signed(q,1)+') + ('+signed(e)+') = '+signed(delta)+' €';
+ const x=247.5+(b-s)*2.025, y=n=>120-n*15;
+ $('modelLine').setAttribute('y1',y(-10*l));$('modelLine').setAttribute('y2',y(10*l));
+ for(const id of ['modelDot','observedDot']){$(id).setAttribute('cx',x)}
+ $('modelDot').setAttribute('cy',y(flow));$('observedDot').setAttribute('cy',y(delta));
+ $('noiseLine').setAttribute('x1',x);$('noiseLine').setAttribute('x2',x);
+ $('noiseLine').setAttribute('y1',y(flow));$('noiseLine').setAttribute('y2',y(delta));
+ $('chartDescription').textContent='订单失衡'+(b-s)+'万欧元，模型项'+signed(flow)+'欧元，观察值'+signed(delta)+'欧元。';
+ let insight=v===0?'没有成交，Amihud 型比率无定义；价格仍可能因其他扰动变化。':q===0?'买卖平衡：即使成交活跃，净订单流也可以为零。此时模型中的价格变化完全来自 ε。':'当前净'+(q>0?'买入':'卖出')+Math.abs(b-s)+' 万欧元，订单流项为 '+signed(flow)+' 欧元。调高 λ，观察同样订单流如何产生更大的价格变化。';
+ if(e!==0 && v>0) insight+=' 当前 ε = '+signed(e)+' 欧元，所以观察到的波动不能全部归因于订单流。';
+ $('insight').textContent=insight;
+}
+function preset(name){ids.forEach((id,i)=>{$(id).value=presets[name][i]});render()}
+ids.forEach(id=>$(id).addEventListener('input',()=>{$('preset').value='custom';render()}));
+$('preset').addEventListener('change',()=>preset($('preset').value));
+$('reset').addEventListener('click',()=>{$('preset').value='directional';preset('directional')});
+const media=matchMedia('(prefers-color-scheme: dark)');
+let manual=false;
+function setTheme(dark){document.documentElement.dataset.theme=dark?'dark':'light';$('theme').setAttribute('aria-pressed',String(dark))}
+function syncTheme(){if(!manual)setTheme(media.matches)}
+syncTheme();media.addEventListener('change',syncTheme);
+try{
+ const parentTheme=window.parent!==window?window.parent.document.querySelector('.ross-journal'):null;
+ if(parentTheme){const sync=()=>{manual=false;setTheme(parentTheme.dataset.mode==='dark')};sync();new MutationObserver(sync).observe(parentTheme,{attributes:true,attributeFilter:['data-mode']})}
+}catch(_){}
+$('theme').addEventListener('click',()=>{manual=true;setTheme(document.documentElement.dataset.theme!=='dark')});
+render();
+})();
+</script></body></html>
