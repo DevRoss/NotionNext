@@ -80,9 +80,7 @@ const Slug = props => {
     tags: post?.tags
   }
 
-  Router.events.on('routeChangeComplete', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  })
+  // Next's Link/router navigation already restores scroll position.
 
   return (
     <ThemeComponents.LayoutSlug {...props} showArticleInfo={true} meta={meta} />

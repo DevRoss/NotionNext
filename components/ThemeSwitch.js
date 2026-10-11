@@ -1,5 +1,5 @@
 import { useGlobal } from '@/lib/global'
-import { ALL_THEME } from '@/themes'
+import { ALL_THEME } from '@/themes/names'
 import React from 'react'
 import { Draggable } from './Draggable'
 /**
